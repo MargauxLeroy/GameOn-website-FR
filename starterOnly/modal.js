@@ -119,6 +119,52 @@ function validate() {
   return true;
 }
 
+/////////////////////////////////////////////////////
+//// #3  AJOUTER VALIDATION OU MESSAGES D'ERREUR ///
+////////////////////////////////////////////////////
+
+// Création des messages d'erreurs
+function createErrorMessage() {
+  const errorMessage = document.createElement("span");
+  errorMessage.classList.add("error-message");
+  errorMessage.style.cssText = "color: red; font-size: 11px;";
+  return errorMessage;
+}
+
+// Affichage des messages d'erreurs
+function displayErrorFeedback(input, errorText) {
+  errorMessage = createErrorMessage();
+  errorMessage.innerHTML = errorText;
+  input.after(errorMessage);
+  input.style.outline = "2px solid red";
+}
+
+// Suppression des messages d'erreurs
+function deleteErrorMessages() {
+  let errorMessages = document.querySelectorAll(".error-message");
+  // Supprime les outlines rouges des inputs
+  cityOptions.style.outline = "none";
+  for (let i = 0; i < inputs.length; i++) {
+    inputs[i].style.outline = "none";
+  }
+  // Retire les messages d'erreurs du DOM
+  for (let i = 0; i < errorMessages.length; i++) {
+    errorMessages[i].remove();
+  }
+}
+
+// Nécessite une première validation manuelle avant d'afficher les messages d'erreurs
+let needDynamicValidation = false;
+
+// Pour tous les champs... on vérifie dynamiquement qu'ils sont corrects sans envoyer la validation
+for (let i = 0; i < inputs.length; i++) {
+  const input = inputs[i];
+  input.addEventListener("input", () => {
+    if (!needDynamicValidation) return;
+    validate(false);
+  });
+}
+
 form.onsubmit = (event) => {
   const isValid = validate();
   if (isValid === false) {
