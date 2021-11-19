@@ -51,7 +51,10 @@ closeBtn.addEventListener("click", closeModal);
 ///// #2 IMPLÉMENTER ENTRÉES DU FORMULAIRE ////////
 ////////////////////////////////////////////////////
 
-function validate() {
+function validate(doSendForm = true) {
+  needDynamicValidation = true;
+  deleteErrorMessages();
+
   // Créé une "copie" du formulaire qui donne accès aux valeurs des champs
   const form = document.querySelector("form");
   console.log(form);
@@ -165,9 +168,62 @@ for (let i = 0; i < inputs.length; i++) {
   });
 }
 
+////////////////////////////////////////////////////////
+//// #4 AFFICHER MODALE DE CONFIRMATION ////////////////
+////////////////////////////////////////////////////////
+
+// Création de la popup de validation
+function createValidationPopup() {
+  // Copie une nouvelle modale à partir de l'existante
+  const newModal = modalbg.cloneNode(true);
+  const modalBody = newModal.querySelector(".modal-body");
+  const closeIcon = newModal.querySelector(".close");
+  const form = modalBody.querySelector("form");
+
+  form.remove();
+
+  newModal.style.display = "block";
+  modalBody.style.cssText = "display: flex; flex-direction: column;";
+
+  // Création de l'élément texte
+  const validationText = document.createElement("p");
+  validationText.innerHTML =
+    "Thank you for submitting your registration details";
+  validationText.style.cssText = "text-align: center; padding: 30vh 0.5vw";
+
+  // Création de l'élément boutton
+  const validationButton = document.createElement("button");
+  validationButton.classList.add("final-submit");
+  validationButton.style.cssText = "margin: 0px 14%; text-align: center;";
+  validationButton.innerHTML = "Close";
+
+  // Fermeture de la modale sur la croix et le boutton
+  validationButton.addEventListener("click", () => newModal.remove());
+  closeIcon.addEventListener("click", () => newModal.remove());
+
+  // Ajout dans le DOM
+  modalBody.appendChild(validationText);
+  modalBody.appendChild(validationButton);
+
+  modalbg.after(newModal);
+}
+
+const DISPLAY_VALIDATION_POPUP = "DISPLAY_VALIDATION_POPUP";
+
 form.onsubmit = (event) => {
   const isValid = validate();
   if (isValid === false) {
     event.preventDefault();
+  } else {
+    sessionStorage.setItem(DISPLAY_VALIDATION_POPUP, "true");
   }
 };
+
+const shouldDisplayValidationPopup = sessionStorage.getItem(
+  DISPLAY_VALIDATION_POPUP
+);
+
+if (shouldDisplayValidationPopup === "true") {
+  sessionStorage.setItem(DISPLAY_VALIDATION_POPUP, "false");
+  createValidationPopup();
+}
