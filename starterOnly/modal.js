@@ -57,7 +57,6 @@ function validate(doSendForm = true) {
 
   // Créé une "copie" du formulaire qui donne accès aux valeurs des champs
   const form = document.querySelector("form");
-  console.log(form);
   const data = new FormData(form);
 
   const first = data.get("first");
@@ -96,7 +95,7 @@ function validate(doSendForm = true) {
   if (isNaN(dateTime)) {
     displayErrorFeedback(
       birthdateInput,
-      "Vous devez entrer votre date de naissance."
+      "Veuillez saisir une date de naissance valide."
     );
     return false;
   }
@@ -193,6 +192,7 @@ function createValidationPopup() {
 
   // Création de l'élément boutton
   const validationButton = document.createElement("button");
+  validationButton.classList.add("btn-submit");
   validationButton.classList.add("final-submit");
   validationButton.style.cssText = "margin: 0px 14%; text-align: center;";
   validationButton.innerHTML = "Close";
@@ -227,3 +227,7 @@ if (shouldDisplayValidationPopup === "true") {
   sessionStorage.setItem(DISPLAY_VALIDATION_POPUP, "false");
   createValidationPopup();
 }
+
+////////////////////////////////////////////////////
+//// #5
+////////////////////////////////////////////////////
