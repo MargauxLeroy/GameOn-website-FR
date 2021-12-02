@@ -51,7 +51,7 @@ closeBtn.addEventListener("click", closeModal);
 ///// #2 IMPLÉMENTER ENTRÉES DU FORMULAIRE ////////
 ////////////////////////////////////////////////////
 
-function validate(doSendForm = true) {
+function isFormValide() {
   needDynamicValidation = true;
   deleteErrorMessages();
 
@@ -92,6 +92,8 @@ function validate(doSendForm = true) {
   }
 
   const dateTime = new Date(birthdate).getTime();
+
+  // Si la date n'est pas valide, getTime renvoit un NaN
   if (isNaN(dateTime)) {
     displayErrorFeedback(
       birthdateInput,
@@ -129,7 +131,7 @@ function validate(doSendForm = true) {
 function createErrorMessage() {
   const errorMessage = document.createElement("span");
   errorMessage.classList.add("error-message");
-  errorMessage.style.cssText = "color: red; font-size: 11px;";
+  errorMessage.style.cssText = "color: red; font-size: 11px; line-height: 1";
   return errorMessage;
 }
 
@@ -158,12 +160,12 @@ function deleteErrorMessages() {
 // Nécessite une première validation manuelle avant d'afficher les messages d'erreurs
 let needDynamicValidation = false;
 
-// Pour tous les champs... on vérifie dynamiquement qu'ils sont corrects sans envoyer la validation
+// Pour tous les champs... on vérifie dynamiquement qu'ils sont corrects
 for (let i = 0; i < inputs.length; i++) {
   const input = inputs[i];
   input.addEventListener("input", () => {
-    if (!needDynamicValidation) return;
-    validate(false);
+    if (needDynamicValidation == false) return;
+    isFormValide();
   });
 }
 
@@ -186,8 +188,7 @@ function createValidationPopup() {
 
   // Création de l'élément texte
   const validationText = document.createElement("p");
-  validationText.innerHTML =
-    "Thank you for submitting your registration details";
+  validationText.innerHTML = "Merci ! Votre réservation a été reçue.";
   validationText.style.cssText = "text-align: center; padding: 30vh 0.5vw";
 
   // Création de l'élément boutton
@@ -197,24 +198,26 @@ function createValidationPopup() {
   validationButton.style.cssText = "margin: 0px 14%; text-align: center;";
   validationButton.innerHTML = "Close";
 
-  // Fermeture de la modale sur la croix et le boutton
-  validationButton.addEventListener("click", () => newModal.remove());
-  closeIcon.addEventListener("click", () => newModal.remove());
-
   // Ajout dans le DOM
   modalBody.appendChild(validationText);
   modalBody.appendChild(validationButton);
-
   modalbg.after(newModal);
+
+  // Fermeture de la modale sur la croix et le boutton
+  validationButton.addEventListener("click", () => newModal.remove());
+  closeIcon.addEventListener("click", () => newModal.remove());
 }
 
+// Gestion de l'affichage de la modale de confirmation
 const DISPLAY_VALIDATION_POPUP = "DISPLAY_VALIDATION_POPUP";
 
+// Validation du formulaire
 form.onsubmit = (event) => {
-  const isValid = validate();
-  if (isValid === false) {
+  if (isFormValide() === false) {
+    // Évite "l'envoi des données" (+ rafraichissement et la suppression des données)
     event.preventDefault();
   } else {
+    // Stocke dans la session du navigateur (clef, valeur)
     sessionStorage.setItem(DISPLAY_VALIDATION_POPUP, "true");
   }
 };
@@ -224,10 +227,11 @@ const shouldDisplayValidationPopup = sessionStorage.getItem(
 );
 
 if (shouldDisplayValidationPopup === "true") {
+  // Éviter que la modale s'affiche au rechargement de la page
   sessionStorage.setItem(DISPLAY_VALIDATION_POPUP, "false");
   createValidationPopup();
 }
 
-////////////////////////////////////////////////////
-//// #5
-////////////////////////////////////////////////////
+////////////////////////////////////////////////////////
+//// #5 GESTION ERREURS D'AFFICHAGE ////////////////////
+////////////////////////////////////////////////////////
